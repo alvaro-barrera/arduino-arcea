@@ -179,6 +179,7 @@ int getLongestWay()
 
 // Get distance in any position
 int getDistance(int servo_position, int ultra_trig, int ultra_echo) {
+  long distance;
   servo_main.write(servo_position);
   delay(2000);
   distance = ultra(ultra_trig, ultra_echo);
