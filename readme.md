@@ -1,7 +1,7 @@
 # Arduino project - ARCEA
 
 ## Material's list
-- Arduino Uno
+- Arduino Uno (1)
 - Ultrasonics sensor - HC-SR04 (2)
 - Protoboard mini (2)
 - Driver L298N (1)

@@ -155,7 +155,7 @@ int getLongestWay()
   {
     aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
     delay(20);
-    while(aux < de)
+    while(aux < right_distance)
     {
       motor(RIGHT,150,150);
       aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
@@ -178,7 +178,7 @@ int getLongestWay()
 }
 
 // Get distance in any position
-int getDistance(servo_position, ultra_trig, ultra_echo) {
+int getDistance(int servo_position, int ultra_trig, int ultra_echo) {
   servo_main.write(servo_position);
   delay(2000);
   distance = ultra(ultra_trig, ultra_echo);
