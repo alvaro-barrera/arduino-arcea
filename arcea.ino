@@ -11,9 +11,11 @@ const int ultra_main_echo = 9;
 const int ultra_secondary_trig = 3;
 const int ultra_secondary_echo = 2;
 
+// Right
 const int IN1 = 12;
 const int IN2 = 13;
 const int ENA = 11;
+// Left
 const int IN3 = 4;
 const int IN4 = 5;
 const int ENB = 6;
@@ -27,8 +29,8 @@ const String STOP = "stop";
 
 void setup(){
   servo_main.attach(7);
-  //Motors' Output pins
 
+  //Motors' Output pins
   pinMode(IN1, OUTPUT);   
   pinMode(IN2, OUTPUT);   
   pinMode(ENA, OUTPUT);   
@@ -56,28 +58,17 @@ void loop(){
   //Activated when ultrasonics detects objects within detection_distancecm
   if(ultra_main < detection_distance || ultra_secondary < detection_distance)  
   {
-    aux = sele();
-       while(aux < 30 && ultra_secondary < aux)
-       {
-         aux = sele();
-         delay(500);
-       }
-      motor(FORWARD,180,180);  
-      delay(1000);
-      //delay(1000);
-      servo_main.write(servo_position_left);
-    //}
-    // else
-    // {
-    //   aux = sele();
-    //   while(aux < 30 && ultra_secondary < aux)
-    //   {
-    //     aux = sele();
-    //     delay(500);
-    //   }
-    // }
+    aux = getLongestWay();
+    while(aux < 30 && ultra_secondary < aux)
+    {
+      aux = getLongestWay();
+      delay(500);
+    }
+    motor(FORWARD,180,180);  
+    delay(1000);
+    servo_main.write(servo_position_left);
   }else {
-    motor(REVERSE,180,180); 
+    motor(FORWARD,180,180); 
     delay(20);
     servo_main.write(servo_position_center);
     delay(1000);
@@ -145,28 +136,14 @@ void motor(String dir,int m1,int m2)
   analogWrite(ENB,m2);
 }
 
-int getDistance(servo_position, ultra_trig, ultra_echo) {
-  servo_main.write(servo_position);
-  delay(2000);
-  distance = ultra(ultra_trig, ultra_echo);
-  delay(20);
-
-  return distance;
-}
-
 // Function that detects whether the left or right path is the longest one
-int sele()             
+int getLongestWay()             
 {
   int left_distance;
   int right_distance;
   int aux;
   motor(STOP,0,0);
   delay(200);
-
-  /*servo_main.write(servo_position_right);
-  delay(2000);
-  right_distance = ultra(ultra_main_trig,ultra_main_echo);
-  delay(20);*/
 
   right_distance = getDistance(servo_position_right, ultra_main_trig, ultra_main_echo);
   left_distance = getDistance(servo_position_left, ultra_main_trig, ultra_main_echo);
@@ -180,23 +157,32 @@ int sele()
     delay(20);
     while(aux < de)
     {
-      motor(2,150,150);
+      motor(RIGHT,150,150);
       aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
       delay(20);
     }
     return right_distance;
   }
-    
   else
   {
     aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
     delay(20);
     while(aux < left_distance)
     {
-      motor(-2,150,150);
+      motor(LEFT,150,150);
       aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
       delay(20);
     }
     return left_distance;
   }
+}
+
+// Get distance in any position
+int getDistance(servo_position, ultra_trig, ultra_echo) {
+  servo_main.write(servo_position);
+  delay(2000);
+  distance = ultra(ultra_trig, ultra_echo);
+  delay(20);
+
+  return distance;
 }
