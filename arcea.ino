@@ -6,7 +6,7 @@ const int servo_position_center = 90;
 const int servo_position_right = 0;
 const int servo_position_left = 180;
 
-const int ultra_main_trig = 10;
+const int ultra_main_trig = 8;
 const int ultra_main_echo = 9;
 const int ultra_secondary_trig = 3;
 const int ultra_secondary_echo = 2;
@@ -25,9 +25,15 @@ const String REVERSE = "reverse";
 const String RIGHT = "right";
 const String LEFT = "left";
 const String STOP = "stop";
+const String ROTATE = "rotate";
+
+// Rotate time
+const int turning_time = 2000;
 
 
 void setup(){
+  Serial.begin(9600);//iniciailzamos la comunicación
+
   servo_main.attach(7);
 
   //Motors' Output pins
@@ -45,7 +51,7 @@ void loop(){
   int ultra_main;
   int ultra_secondary;
   int cont = 0;
-  int detection_distance = 10;
+  int detection_distance = 20;
   servo_main.write(servo_position_center);
 
   //Activating the main ultrasonic
@@ -55,23 +61,47 @@ void loop(){
   ultra_secondary = ultra(ultra_secondary_trig,ultra_secondary_echo);
   delay(20);
 
-  //Activated when ultrasonics detects objects within detection_distancecm
+  //Activated when ultrasonics detects objects within detection_distance cm
   if(ultra_main < detection_distance || ultra_secondary < detection_distance)  
   {
     aux = getLongestWay();
-    while(aux < 30 && ultra_secondary < aux)
+    motor(STOP,150,150);
+
+    while(aux < detection_distance)
+    {
+      motor(REVERSE,180,180); 
+      motor(STOP,150,150);
+      aux = getLongestWay();
+      delay(500);
+
+    }
+    /*if (aux < detection_distance)
+    {
+      if (ultra_secondary > detection_distance)
+      {
+        motor(REVERSE,180,180); 
+        motor(STOP,150,150);
+      }
+    }*/
+    
+    motor(STOP,150,150);
+    motor(FORWARD,180,180); 
+    /*Serial.print(aux);
+        
+    //while(aux < detection_distance && ultra_secondary < aux)
+    while(false)
     {
       aux = getLongestWay();
       delay(500);
     }
-    motor(FORWARD,180,180);  
+    //motor(FORWARD,180,180);  
     delay(1000);
-    servo_main.write(servo_position_left);
+    servo_main.write(servo_position_left);*/
   }else {
     motor(FORWARD,180,180); 
-    delay(20);
+    /*delay(20);
     servo_main.write(servo_position_center);
-    delay(1000);
+    delay(1000);*/
   }
 }
 
@@ -102,6 +132,7 @@ void motor(String dir,int m1,int m2)
     digitalWrite(IN2,LOW);
     digitalWrite(IN3,HIGH);
     digitalWrite(IN4,LOW);
+    delay(turning_time);
   }
   else if(dir == "reverse")
   {
@@ -112,17 +143,19 @@ void motor(String dir,int m1,int m2)
   }
   else if(dir == "right")
   {
-    digitalWrite(IN1,HIGH);
-    digitalWrite(IN2,LOW);
-    digitalWrite(IN3,LOW);
-    digitalWrite(IN4,HIGH);
-  }
-  else if(dir == "left")
-  {
     digitalWrite(IN1,LOW);
     digitalWrite(IN2,HIGH);
     digitalWrite(IN3,HIGH);
     digitalWrite(IN4,LOW);
+    delay(turning_time);    // Espera hasta que gire los 90°
+  }
+  else if(dir == "left")
+  {
+    digitalWrite(IN1,HIGH);
+    digitalWrite(IN2,LOW);
+    digitalWrite(IN3,LOW);
+    digitalWrite(IN4,HIGH);
+    delay(turning_time);
   }
   else if(dir == "stop")
   {
@@ -131,6 +164,15 @@ void motor(String dir,int m1,int m2)
     digitalWrite(IN3,LOW);
     digitalWrite(IN4,LOW);
   }
+else if(dir == "rotate")
+  {
+    digitalWrite(IN1,LOW);
+    digitalWrite(IN2,LOW);
+    digitalWrite(IN3,LOW);
+    digitalWrite(IN4,LOW);
+    delay(turning_time * 2);
+  }
+
 
   analogWrite(ENA,m1);
   analogWrite(ENB,m2);
@@ -153,26 +195,34 @@ int getLongestWay()
   
   if(right_distance > left_distance)
   {
-    aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
+    motor(RIGHT,150,150);
+
+    /*aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
     delay(20);
-    while(aux < right_distance)
+      motor(RIGHT,150,150);
+
+  While(aux < right_distance)
     {
       motor(RIGHT,150,150);
       aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
       delay(20);
-    }
+    }*/
     return right_distance;
   }
   else
   {
-    aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
+    motor(LEFT,150,150);
+    
+        /*aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
     delay(20);
+    motor(LEFT,150,150);
+
     while(aux < left_distance)
     {
       motor(LEFT,150,150);
       aux = ultra(ultra_secondary_trig,ultra_secondary_echo);
       delay(20);
-    }
+    }*/
     return left_distance;
   }
 }
