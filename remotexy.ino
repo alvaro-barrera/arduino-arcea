@@ -76,7 +76,7 @@ void loop()
     input_remote = Serial.read();
   }
 
-  if (last_input_remote != "" && last_input_remote.find("voice") != std::string::npos && input_remote == "empty") {
+  if (last_input_remote != "" && last_input_remote.indexOf("voice") > 0 && input_remote == "empty") {
     input_remote = last_input_remote;
   }
 
