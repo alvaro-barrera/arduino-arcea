@@ -61,19 +61,28 @@ struct {
 
 #include <Servo.h>  
 
-Servo myservo;
+Servo servo_main;
 
-#define PIN_BUTTON_1 13 //IN1 Derecha Atrás
-#define PIN_BUTTON_2 12 //IN2 Derecha 
-#define PIN_BUTTON_3 4 //IN3 Izquierda
-#define PIN_BUTTON_4 5 //IN4 Izquierda Atrás
+const int PIN_BUTTON_1 = 13; //IN1 Derecha Atrás
+const int PIN_BUTTON_2 = 12; //IN2 Derecha 
+const int PIN_BUTTON_3 _= 4; //IN3 Izquierda
+const int PIN_BUTTON_4 = 5; //IN4 Izquierda Atrás
 
+
+const int servo_position_center = 90;
+const int servo_position_right = 0;
+const int servo_position_left = 180;
+
+const int ultra_main_trig = 8;
+const int ultra_main_echo = 9;
+const int ultra_secondary_trig = 3;
+const int ultra_secondary_echo = 2;
 
 void setup() 
 {
   RemoteXY_Init (); 
 
-  myservo.attach(10); 
+  servo_main.attach(10); 
   RemoteXY.slider_1 = 50;
   
   pinMode (PIN_BUTTON_1, OUTPUT);
@@ -88,13 +97,26 @@ void setup()
 
 void loop() 
 { 
+  int aux;
+  int ultra_main;
+  int ultra_secondary;
+  int cont = 0;
+  int detection_distance = 20;
+  int left_distance;
+  int right_distance;
+  servo_main.write(servo_position_center);
   RemoteXY_Handler ();
 
-  int ms = (2500 - RemoteXY.slider_1 * 20); 
-  myservo.writeMicroseconds(ms);
+  /*int ms = (2500 - RemoteXY.slider_1 * 20); 
+  servo_main.writeMicroseconds(ms);*/
 
   if(RemoteXY.button_1==1) {
-    goForward();
+    ultra_main = ultra(ultra_main_trig,ultra_main_echo);
+    if(ultra_main > detection_distance) {
+        goForward();
+    }else { 
+        //Alarm
+    }
     /*digitalWrite(PIN_BUTTON_2, HIGH); //Derecha
     digitalWrite(PIN_BUTTON_3, HIGH); //Izquierda*/
   } else {
@@ -102,23 +124,38 @@ void loop()
     /*digitalWrite(PIN_BUTTON_2, LOW); //Derecha
     digitalWrite(PIN_BUTTON_3, LOW); //Izquierda*/
   }
-
+|
   if(RemoteXY.button_2==1) {
-    goRight();
+    right_distance = getDistance(servo_position_right, ultra_main_trig, ultra_main_echo);
+    if (right_distance > detection_distance) {
+        goRight();
+    }else {
+        //Alarm
+    }
     //digitalWrite(PIN_BUTTON_2, HIGH); //Derecha
   } else {
     //digitalWrite(PIN_BUTTON_2, LOW); Not
   }
 
   if(RemoteXY.button_3==1) {
-    goLeft(); 
+    left_distance = getDistance(servo_position_left, ultra_main_trig, ultra_main_echo);
+    if (left_distance > detection_distance) {
+        goLeft(); 
+    }else {
+        //Alarm
+    }
     //digitalWrite(PIN_BUTTON_3, HIGH); //Izquierda
   } else {
     //digitalWrite(PIN_BUTTON_3, LOW); Not
   }
 
   if(RemoteXY.button_4==1) {
-    goReverse();
+    ultra_secondary = ultra(ultra_secondary_trig,ultra_secondary_echo);
+    if (ultra_secondary > detection_distance) {
+        goReverse();
+    }else {
+        //Alarm
+    }
     /*digitalWrite(PIN_BUTTON_1, HIGH); //Derecha atrás
     digitalWrite(PIN_BUTTON_4, HIGH); //Izquierda atrás*/
   } else {
@@ -134,6 +171,36 @@ void loop()
 
 
 }
+
+// Ultrasonic control function
+int ultra(int Trig, int Echo)
+{
+  long duration;
+  long distance;
+  
+  digitalWrite(Trig,LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trig,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trig,LOW);
+  
+  duration = pulseIn(Echo,HIGH);
+  distance = (duration/2)/29;
+  
+  return distance;
+}
+
+// Get distance in any position
+int getDistance(int servo_position, int ultra_trig, int ultra_echo) {
+  long distance;
+  servo_main.write(servo_position);
+  delay(2000);
+  distance = ultra(ultra_trig, ultra_echo);
+  delay(20);
+
+  return distance;
+}
+
 
 void goForward() {
     digitalWrite(PIN_BUTTON_2, HIGH); //Derecha
