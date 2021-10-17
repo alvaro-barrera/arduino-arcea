@@ -46,14 +46,13 @@ input_remote=='4' => right
 */
 
 
-char input_remote;
-char last_input_remote = "";
+String input_remote = "";
+String last_input_remote = "";
 
 void setup() 
 {
   Serial.begin(9600);  
   servo_main.attach(10); 
-    MANUAL_LEFT
   pinMode (IN1, OUTPUT);
   pinMode (IN2, OUTPUT);
   pinMode (IN3, OUTPUT);
