@@ -18,17 +18,17 @@ const int ultra_main_echo = 9;
 const int ultra_secondary_trig = 3;
 const int ultra_secondary_echo = 2;
 
-const char MANUAL_FORWARD = "1";
-const char MANUAL_REVERSE = "2";
-const char MANUAL_RIGHT = "4";
-const char MANUAL_LEFT = "3";
+const char MANUAL_FORWARD = '1';
+const char MANUAL_REVERSE = '2';
+const char MANUAL_RIGHT = '4';
+const char MANUAL_LEFT = '3';
 
-const char VOICE_FORWARD = "5";
-const char VOICE_REVERSE = "6";
-const char VOICE_RIGHT = "8";
-const char VOICE_LEFT = "7";
+const char VOICE_FORWARD = '5';
+const char VOICE_REVERSE = '6';
+const char VOICE_RIGHT = '8';
+const char VOICE_LEFT = '7';
 
-const char STOP = "9";
+const char STOP = '9';
 
 const int speaker = 6;
 int frequency = 220;    // frequency correspondiente a la nota La
@@ -74,11 +74,17 @@ void loop()
   if(Serial.available()>0){
     input_remote = Serial.read();
   }
-  Serial.println("input_remote: "+ String(input_remote));
-
+  //Serial.println("input_remote: "+ String(input_remote));
+  
+  if(atoi(last_input_remote) > 0 && atoi(last_input_remote) < 5 && atoi(input_remote) == 0) {
+    stopMotor();
+  }
+  
   if (last_input_remote != "" && atoi(last_input_remote) > 4 && atoi(last_input_remote) < 9 && atoi(input_remote) == 0) {
     input_remote = last_input_remote;
   }
+  
+  //Serial.println("input_remote 2: "+ String(input_remote));
 
   last_input_remote = input_remote;
 
@@ -104,10 +110,10 @@ void loop()
     right_distance = getDistance(servo_position_right, ultra_main_trig, ultra_main_echo);
     if(right_distance < detection_distance) {         
         //  alarm();        
-         stopRight();
+      stopRight();
     }else { 
         // alarm();        
-        goRight();
+      goRight();
         //Alarm
     }
   } else {
@@ -139,10 +145,6 @@ void loop()
     // stopReverse();
     /*digitalWrite(IN2, LOW); //Derecha
     digitalWrite(IN4, LOW); //Izquierda*/
-  }
-
-  if(input_remote == MANUAL_FORWARD) {
-    stopMotor();
   }
 }
 
