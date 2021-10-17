@@ -65,7 +65,7 @@ Servo servo_main;
 
 const int PIN_BUTTON_1 = 13; //IN1 Derecha Atrás
 const int PIN_BUTTON_2 = 12; //IN2 Derecha 
-const int PIN_BUTTON_3 _= 4; //IN3 Izquierda
+const int PIN_BUTTON_3 = 4; //IN3 Izquierda
 const int PIN_BUTTON_4 = 5; //IN4 Izquierda Atrás
 
 
@@ -120,11 +120,11 @@ void loop()
     /*digitalWrite(PIN_BUTTON_2, HIGH); //Derecha
     digitalWrite(PIN_BUTTON_3, HIGH); //Izquierda*/
   } else {
-    stopForward()
+    stopForward();
     /*digitalWrite(PIN_BUTTON_2, LOW); //Derecha
     digitalWrite(PIN_BUTTON_3, LOW); //Izquierda*/
   }
-|
+
   if(RemoteXY.button_2==1) {
     right_distance = getDistance(servo_position_right, ultra_main_trig, ultra_main_echo);
     if (right_distance > detection_distance) {
