@@ -18,18 +18,17 @@ const int ultra_main_echo = 9;
 const int ultra_secondary_trig = 3;
 const int ultra_secondary_echo = 2;
 
-const String MANUAL_FORWARD = "manual_forward";
-const String MANUAL_REVERSE = "manual_reverse";
-const String MANUAL_RIGHT = "manual_right";
-const String MANUAL_LEFT = "manual_left";
+const char MANUAL_FORWARD = "1";
+const char MANUAL_REVERSE = "2";
+const char MANUAL_RIGHT = "4";
+const char MANUAL_LEFT = "3";
 
-const String VOICE_FORWARD = "voice_forward";
-const String VOICE_REVERSE = "voice_rverse";
-const String VOICE_RIGHT = "voice_right";
-const String VOICE_LEFT = "voice_left";
+const char VOICE_FORWARD = "5";
+const char VOICE_REVERSE = "6";
+const char VOICE_RIGHT = "8";
+const char VOICE_LEFT = "7";
 
-const String STOP = "stop";
-const String ROTATE = "rotate";
+const char STOP = "9";
 
 const int speaker = 6;
 int frequency = 220;    // frequency correspondiente a la nota La
@@ -46,8 +45,8 @@ input_remote=='4' => right
 */
 
 
-String input_remote = "";
-String last_input_remote = "";
+char input_remote;
+char last_input_remote;
 
 void setup() 
 {
@@ -75,19 +74,17 @@ void loop()
   if(Serial.available()>0){
     input_remote = Serial.read();
   }
+  Serial.println("input_remote: "+ String(input_remote));
 
-  if (last_input_remote != "" && last_input_remote.indexOf("voice") > 0 && input_remote == "empty") {
+  if (last_input_remote != "" && atoi(last_input_remote) > 4 && atoi(last_input_remote) < 9 && atoi(input_remote) == 0) {
     input_remote = last_input_remote;
   }
 
-  last_input_remote = last_input_remote;
-
-  Serial.println("input_remote: "+ String(input_remote));
+  last_input_remote = input_remote;
 
   // Forward
   if(input_remote == MANUAL_FORWARD) {
     ultra_main = ultra(ultra_main_trig,ultra_main_echo);
-    
     if(ultra_main < detection_distance) {
         stopForward();
         alarm();
@@ -142,6 +139,10 @@ void loop()
     // stopReverse();
     /*digitalWrite(IN2, LOW); //Derecha
     digitalWrite(IN4, LOW); //Izquierda*/
+  }
+
+  if(input_remote == MANUAL_FORWARD) {
+    stopMotor();
   }
 }
 
