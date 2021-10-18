@@ -85,7 +85,7 @@ void loop()
     stopMotor();
   }
   
-  if (last_input_remote != '' && String(last_input_remote).toInt() > 4 && String(last_input_remote).toInt() < 9 && String(input_remote).toInt() == 0) {
+  if (last_input_remote != "" && String(last_input_remote).toInt() > 4 && String(last_input_remote).toInt() < 9 && String(input_remote).toInt() == 0) {
     input_remote = last_input_remote;
      Serial.println("validate 2 ");
   }
@@ -96,25 +96,22 @@ void loop()
 
   // Forward
   if(input_remote == MANUAL_FORWARD || input_remote == VOICE_FORWARD) {
-    ultra_main = ultra(ultra_main_trig,ultra_main_echo);
+    ultra_main = ultra(ultra_main_trig, ultra_main_echo);
     if(ultra_main < detection_distance) {
-        stopForward();
-        alarm();
+      stopForward();
+      alarm();
     }else { 
-        goForward();
-        //Alarm
+      goForward();
     }
   } 
 
   if(input_remote == MANUAL_RIGHT || input_remote == VOICE_RIGHT) {
     right_distance = getDistance(servo_position_right, ultra_main_trig, ultra_main_echo);
     if(right_distance < detection_distance) {         
-        //  alarm();        
       stopRight();
+      alarm();
     }else { 
-        // alarm();        
       goRight();
-        //Alarm
     }
   } 
 
@@ -122,21 +119,23 @@ void loop()
     left_distance = getDistance(servo_position_left, ultra_main_trig, ultra_main_echo);    
     if (left_distance < detection_distance) {
       stopLeft(); 
+      alarm();
     }else {
       goLeft();
     }
   } 
 
   if(input_remote == MANUAL_REVERSE || input_remote == VOICE_REVERSE) {
-    ultra_secondary = ultra(ultra_secondary_trig,ultra_secondary_echo);
-    if (ultra_secondary > detection_distance) {
-        goReverse();
+    ultra_secondary = ultra(ultra_secondary_trig, ultra_secondary_echo);
+    if (ultra_secondary < detection_distance) {
+      stopReverse();
+      alarm();
     }else {
-        //Alarm
+      goReverse();
     }
   } 
 
-  if(input_remote == STOP)) {
+  if(input_remote == STOP) {
     stopMotor();
   }
 }
