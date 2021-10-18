@@ -2,15 +2,15 @@
 
 Servo servo_main;
 
-// Rigth
+// Motor - Right
 const int IN2 = 13;
 const int IN1 = 12;
-
-// Left
+// Motor - Left
 const int IN3 = 4;
 const int IN4 = 5;
 
 // Servo
+const int servo_pin = 10;
 const int servo_position_center = 90;
 const int servo_position_right = 0;
 const int servo_position_left = 180;
@@ -21,7 +21,7 @@ const int ultra_main_echo = 9;
 const int ultra_secondary_trig = 3;
 const int ultra_secondary_echo = 2;
 
-// Directions
+// Movement direction's values
 // 1. Manual
 const char MANUAL_FORWARD = '1';
 const char MANUAL_REVERSE = '2';
@@ -32,23 +32,32 @@ const char VOICE_FORWARD = '5';
 const char VOICE_REVERSE = '6';
 const char VOICE_RIGHT = '8';
 const char VOICE_LEFT = '7';
-
+// Shared
 const char STOP = '9';
 
 // Speaker
-const int speaker = 6;
+const int speaker_pin = 6;
 int frequency = 220;
 int counter;
-const float m = 1.059; 
+float refresh_value = 1.059; 
 
 // Input remote: Manual or Voice
 char input_remote;
 char last_input_remote;
 
+// Detection distance in cm
+const long detection_distance = 20.0;
+
+// Initializing variables for distance measurement
+long front_distance;
+long back_distance;
+long left_distance;
+long right_distance;
+
 void setup() 
 {
   Serial.begin(9600);  
-  servo_main.attach(10); 
+  servo_main.attach(servo_pin); 
   pinMode (IN1, OUTPUT);
   pinMode (IN2, OUTPUT);
   pinMode (IN3, OUTPUT);
@@ -57,38 +66,35 @@ void setup()
 
 void loop() 
 { 
-  int aux;
-  int ultra_main;
-  int ultra_secondary;
-  int cont = 0;
-  int detection_distance = 20;
-  int left_distance;
-  int right_distance;
-
+  // Move the main ultrasonic to the center
   servo_main.write(servo_position_center);
 
   // Bluetooth's conection
-  if(Serial.available()>0){
+  if(Serial.available() > 0){
     input_remote = Serial.read();
   }
   
+  // When the last input of remote control is in range of manual values and current value is zero (No command), 
+  // or the last value is in range of manual or voice values and the last value is different to current value, then stop motor
   if((String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) || 
     (String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 9 && last_input_remote != input_remote)) {
     stopMotor();
   }
   
+  // When the last input is not empty, is in range of voice values and current is zero (No command), then the last value remains active
   if (last_input_remote != "" && String(last_input_remote).toInt() > 4 && String(last_input_remote).toInt() < 9 && String(input_remote).toInt() == 0) {
     input_remote = last_input_remote;
   }
 
+  // Save the last value
   last_input_remote = input_remote;
 
   // Forward
   if(input_remote == MANUAL_FORWARD || input_remote == VOICE_FORWARD) {
-    ultra_main = ultra(ultra_main_trig, ultra_main_echo);
-    if(ultra_main < detection_distance) {
+    front_distance = getDistance(servo_position_center, ultra_main_trig, ultra_main_echo);
+    if(front_distance < detection_distance) {
       stopForward();
-      alarm();
+      activateAlarm();
     }else { 
       goForward();
     }
@@ -96,10 +102,10 @@ void loop()
 
   // Reverse
   if(input_remote == MANUAL_REVERSE || input_remote == VOICE_REVERSE) {
-    ultra_secondary = ultra(ultra_secondary_trig, ultra_secondary_echo);
-    if (ultra_secondary < detection_distance) {
+    back_distance = getDistanceByUltra(ultra_secondary_trig, ultra_secondary_echo);
+    if (back_distance < detection_distance) {
       stopReverse();
-      alarm();
+      activateAlarm();
     }else {
       goReverse();
     }
@@ -110,7 +116,7 @@ void loop()
     right_distance = getDistance(servo_position_right, ultra_main_trig, ultra_main_echo);
     if(right_distance < detection_distance) {         
       stopRight();
-      alarm();
+      activateAlarm();
     }else { 
       goRight();
     }
@@ -121,7 +127,7 @@ void loop()
     left_distance = getDistance(servo_position_left, ultra_main_trig, ultra_main_echo);    
     if (left_distance < detection_distance) {
       stopLeft(); 
-      alarm();
+      activateAlarm();
     }else {
       goLeft();
     }
@@ -134,7 +140,7 @@ void loop()
 }
 
 // Ultrasonic control function
-long ultra(int Trig, int Echo)
+long getDistanceByUltra(int Trig, int Echo)
 {
   long duration;
   long distance;
@@ -156,11 +162,26 @@ long getDistance(int servo_position, int ultra_trig, int ultra_echo) {
   long distance;
   servo_main.write(servo_position);
   delay(2000);
-  distance = ultra(ultra_trig, ultra_echo);
+  distance = getDistanceByUltra(ultra_trig, ultra_echo);
   delay(20);
 
   return distance;
 }
+
+// Activating alarm with different frequencies
+void activateAlarm(){
+  for(counter = 0, frequency = 220; counter < 2; counter++){
+    frequency = frequency * refresh_value; // Refresh value
+    tone(speaker_pin,frequency); 
+    delay(1500);                 //1.5 seconds
+    noTone(speaker_pin); 
+    delay(500);
+  }
+}
+
+/*
+* Switching motors on and off in different directions
+**/ 
 
 void goForward() {
   digitalWrite(IN1, HIGH);
@@ -183,6 +204,7 @@ void stopRight() {
 void goLeft() {
   digitalWrite(IN1, HIGH);
 }
+
 void stopLeft() {
   digitalWrite(IN1, LOW);
 }
@@ -202,14 +224,4 @@ void stopMotor() {
   digitalWrite(IN3, LOW);
   digitalWrite(IN2, LOW);
   digitalWrite(IN4, LOW);
-}
-
-void alarm(){
-  for(counter = 0, frequency = 220; counter < 2; counter++){
-    frequency = frequency * m; // Refresh value
-    tone(speaker,frequency); 
-    delay(1500);                 //1.5 seconds
-    noTone(speaker); 
-    delay(500);
-  }
 }
