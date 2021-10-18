@@ -79,10 +79,10 @@ void loop()
   Serial.println("last_input_remote: "+ String(last_input_remote));
 
   
-  if(String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) {
+  if((String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) 
+  || (String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 9 && last_input_remote != input_remote)) {
     Serial.println("stopMotor: ");
     stopMotor();
-
   }
   
   if (last_input_remote != '' && String(last_input_remote).toInt() > 4 && String(last_input_remote).toInt() < 9 && String(input_remote).toInt() == 0) {
@@ -135,6 +135,10 @@ void loop()
         //Alarm
     }
   } 
+
+  if(input_remote == STOP)) {
+    stopMotor();
+  }
 }
 
 // Ultrasonic control function
