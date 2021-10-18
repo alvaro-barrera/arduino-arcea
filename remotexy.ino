@@ -95,7 +95,7 @@ void loop()
   last_input_remote = input_remote;
 
   // Forward
-  if(input_remote == MANUAL_FORWARD) {
+  if(input_remote == MANUAL_FORWARD || input_remote == VOICE_FORWARD) {
     ultra_main = ultra(ultra_main_trig,ultra_main_echo);
     if(ultra_main < detection_distance) {
         stopForward();
@@ -104,15 +104,9 @@ void loop()
         goForward();
         //Alarm
     }
-    /*digitalWrite(IN1, HIGH); //Derecha
-    digitalWrite(IN3, HIGH); //Izquierda*/
-  } else {
-    // stopForward();
-    /*digitalWrite(IN1, LOW); //Derecha
-    digitalWrite(IN3, LOW); //Izquierda*/
-  }
+  } 
 
-  if(input_remote == MANUAL_RIGHT) {
+  if(input_remote == MANUAL_RIGHT || input_remote == VOICE_RIGHT) {
     right_distance = getDistance(servo_position_right, ultra_main_trig, ultra_main_echo);
     if(right_distance < detection_distance) {         
         //  alarm();        
@@ -122,36 +116,25 @@ void loop()
       goRight();
         //Alarm
     }
-  } else {
-    //digitalWrite(IN1, LOW); Not
-  }
+  } 
 
-  if(input_remote == MANUAL_LEFT) {
+  if(input_remote == MANUAL_LEFT || input_remote == VOICE_LEFT) {
     left_distance = getDistance(servo_position_left, ultra_main_trig, ultra_main_echo);    
     if (left_distance < detection_distance) {
       stopLeft(); 
     }else {
       goLeft();
     }
-    //digitalWrite(IN3, HIGH); //Izquierda
-  } else {
-    //digitalWrite(IN3, LOW); Not
-  }
+  } 
 
-  if(input_remote == MANUAL_REVERSE) {
+  if(input_remote == MANUAL_REVERSE || input_remote == VOICE_REVERSE) {
     ultra_secondary = ultra(ultra_secondary_trig,ultra_secondary_echo);
     if (ultra_secondary > detection_distance) {
         goReverse();
     }else {
         //Alarm
     }
-    /*digitalWrite(IN2, HIGH); //Derecha atrás
-    digitalWrite(IN4, HIGH); //Izquierda atrás*/
-  } else {
-    // stopReverse();
-    /*digitalWrite(IN2, LOW); //Derecha
-    digitalWrite(IN4, LOW); //Izquierda*/
-  }
+  } 
 }
 
 // Ultrasonic control function
