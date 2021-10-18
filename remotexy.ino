@@ -75,13 +75,19 @@ void loop()
     input_remote = Serial.read();
   }
   //Serial.println("input_remote: "+ String(input_remote));
+  Serial.println("input_remote: "+ String(input_remote));
+  Serial.println("last_input_remote: "+ String(last_input_remote));
+
   
-  if(atoi(last_input_remote) > 0 && atoi(last_input_remote) < 5 && atoi(input_remote) == 0) {
+  if(String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) {
+    Serial.println("stopMotor: ");
     stopMotor();
+
   }
   
-  if (last_input_remote != "" && atoi(last_input_remote) > 4 && atoi(last_input_remote) < 9 && atoi(input_remote) == 0) {
+  if (last_input_remote != '' && String(last_input_remote).toInt() > 4 && String(last_input_remote).toInt() < 9 && String(input_remote).toInt() == 0) {
     input_remote = last_input_remote;
+     Serial.println("validate 2 ");
   }
   
   //Serial.println("input_remote 2: "+ String(input_remote));
@@ -183,6 +189,7 @@ void goForward() {
 }
 
 void stopForward() {
+
   digitalWrite(IN1, LOW); //Derecha
   digitalWrite(IN3, LOW); //Izquierda
 }
