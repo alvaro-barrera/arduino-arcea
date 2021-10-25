@@ -82,7 +82,8 @@ void loop()
   }
   
   // When the last input is not empty, is in range of voice values and current is zero (No command), then the last value remains active
-  if (last_input_remote != "" && String(last_input_remote).toInt() > 4 && String(last_input_remote).toInt() < 7 && String(input_remote).toInt() == 0) {
+  if (last_input_remote != "" && (String(last_input_remote).toInt() == 1 || String(last_input_remote).toInt() == 2 ||  String(last_input_remote).toInt() == 5 || String(last_input_remote).toInt() == 6)
+   && String(input_remote).toInt() == 0) {
     input_remote = last_input_remote;
   }
 
