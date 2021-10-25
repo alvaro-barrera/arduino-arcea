@@ -76,8 +76,7 @@ void loop()
   
   // When the last input of remote control is in range of manual values and current value is zero (No command), 
   // or the last value is in range of manual or voice values and the last value is different to current value, then stop motor
-  if((String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) || 
-    (String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 9 && last_input_remote != input_remote)) {
+  if((String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) || (String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 9 && last_input_remote != input_remote)) {
     stopMotor();
   }
   
