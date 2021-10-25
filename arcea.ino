@@ -76,13 +76,13 @@ void loop()
   
   // When the last input of remote control is in range of manual values and current value is zero (No command), 
   // or the last value is in range of manual or voice values and the last value is different to current value, then stop motor
-  if((String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) || 
-    (String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 9 && last_input_remote != input_remote)) {
+  if((String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 5 && String(input_remote).toInt() == 0) || (String(last_input_remote).toInt() > 0 && String(last_input_remote).toInt() < 9 && last_input_remote != input_remote)) {
     stopMotor();
   }
   
   // When the last input is not empty, is in range of voice values and current is zero (No command), then the last value remains active
-  if (last_input_remote != "" && String(last_input_remote).toInt() > 4 && String(last_input_remote).toInt() < 9 && String(input_remote).toInt() == 0) {
+  if (last_input_remote != "" && (String(last_input_remote).toInt() == 1 || String(last_input_remote).toInt() == 2 ||  String(last_input_remote).toInt() == 5 || String(last_input_remote).toInt() == 6)
+   && String(input_remote).toInt() == 0) {
     input_remote = last_input_remote;
   }
 
@@ -119,6 +119,8 @@ void loop()
       activateAlarm();
     }else { 
       goRight();
+      delay(1500);
+      stopRight();
     }
   } 
 
@@ -130,6 +132,8 @@ void loop()
       activateAlarm();
     }else {
       goLeft();
+      delay(1500);
+      stopLeft();
     }
   } 
 
